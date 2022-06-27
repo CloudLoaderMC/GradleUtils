@@ -18,7 +18,7 @@
  * USA
  */
 
-package net.minecraftforge.gradleutils.tasks;
+package ml.darubyminer360.gradleutils.tasks;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;

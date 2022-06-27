@@ -18,7 +18,7 @@
  * USA
  */
 
-package net.minecraftforge.gradleutils;
+package ml.darubyminer360.gradleutils;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;

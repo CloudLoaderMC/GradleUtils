@@ -1,7 +1,7 @@
-import net.minecraftforge.gradleutils.ChangelogUtils
-import net.minecraftforge.gradleutils.GradleUtils
-import net.minecraftforge.gradleutils.tasks.ExtractTeamCityProjectConfigurationTask
-import net.minecraftforge.gradleutils.tasks.GenerateChangelogTask
+import ml.darubyminer360.gradleutils.ChangelogUtils
+import ml.darubyminer360.gradleutils.GradleUtils
+import ml.darubyminer360.gradleutils.tasks.ExtractTeamCityProjectConfigurationTask
+import ml.darubyminer360.gradleutils.tasks.GenerateChangelogTask
 
 plugins {
     id 'java-gradle-plugin'
@@ -20,7 +20,7 @@ java {
     }
 }
 
-group 'net.minecraftforge.gradleutils' //Test
+group 'ml.darubyminer360.gradleutils' //Test
 version GradleUtils.getTagOffsetVersion(GIT_INFO)
 println('Version: ' + version)
 
@@ -67,8 +67,8 @@ license {
     header = file('HEADER')
     ext {
         name = 'GradleUtils'
-        year = 2021
-        fullname = 'Forge Development LLC'
+        year = 2022
+        fullname = 'DaRubyMiner360'
     }
     exclude '**/*.properties'
 }
@@ -76,8 +76,8 @@ license {
 gradlePlugin {
     plugins {
         gradleutils {
-            id = 'net.minecraftforge.gradleutils'
-            implementationClass = 'net.minecraftforge.gradleutils.GradleUtilsPlugin'
+            id = 'ml.darubyminer360.gradleutils'
+            implementationClass = 'ml.darubyminer360.gradleutils.GradleUtilsPlugin'
         }
     }
 }
@@ -93,16 +93,16 @@ publishing {
 
             pom {
                 name = 'Gradle Utils'
-                description = 'Used by MinecraftForge projects as a util library for Gradle buildscripts'
-                url = 'https://github.com/MinecraftForge/GradleUtils'
+                description = 'Used by CloudLoaderMC projects as a util library for Gradle buildscripts'
+                url = 'https://github.com/CloudLoaderMC/GradleUtils'
                 scm {
-                    url = 'https://github.com/MinecraftForge/GradleUtils'
-                    connection = 'scm:git:git://github.com/MinecraftForge/GradleUtils.git'
-                    developerConnection = 'scm:git:git@github.com:MinecraftForge/GradleUtils.git'
+                    url = 'https://github.com/CloudLoaderMC/GradleUtils'
+                    connection = 'scm:git:git://github.com/CloudLoaderMC/GradleUtils.git'
+                    developerConnection = 'scm:git:git@github.com:CloudLoaderMC/GradleUtils.git'
                 }
                 issueManagement {
                     system = 'github'
-                    url = 'https://github.com/MinecraftForge/GradleUtils/issues'
+                    url = 'https://github.com/CloudLoaderMC/GradleUtils/issues'
                 }
 
                 licenses {
@@ -114,23 +114,19 @@ publishing {
 
                 developers {
                     developer {
-                        id = 'LexManos'
-                        name = 'Lex Manos'
-                    }
-                    developer {
-                        id = 'SizableShrimp'
-                        name = 'SizableShrimp'
+                        id = 'DaRubyMiner360'
+                        name = 'DaRubyMiner360'
                     }
                 }
             }
         }
     }
     repositories {
-        maven GradleUtils.getPublishingForgeMaven(project)
+        maven GradleUtils.getPublishingCloudMaven("GradleUtils", project)
     }
 }
 
 task setupTeamCityProject(type: ExtractTeamCityProjectConfigurationTask) {
 }
 
-GradleUtils.setupCITasks(project);
+//GradleUtils.setupCITasks(project);

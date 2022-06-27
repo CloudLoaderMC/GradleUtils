@@ -18,13 +18,12 @@
  * USA
  */
 
-package net.minecraftforge.gradleutils
+package ml.darubyminer360.gradleutils
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.transport.URIish
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.authentication.http.BasicAuthentication
@@ -95,7 +94,25 @@ class GradleUtils {
      * @return a closure
      */
     static getPublishingForgeMaven(Project project, File defaultFolder = project.rootProject.file('repo')) {
-        return setupSnapshotCompatiblePublishing(project, 'https://maven.minecraftforge.net/', defaultFolder)
+        return setupForgeSnapshotCompatiblePublishing(project, 'https://maven.minecraftforge.net/', defaultFolder)
+    }
+
+    /**
+     * Get a closure to be passed into {@link org.gradle.api.artifacts.dsl.RepositoryHandler#maven(groovy.lang.Closure)}
+     * in a publishing block.
+     *
+     * Important the following environment variables must be set for this to work:
+     *  - GITHUB_ACTOR: Containing the username to use for authentication
+     *  - GITHUB_TOKEN: Containing the password to use for authentication
+     *  - MAVEN_URL_RELEASE: Containing the URL to use for the release repository
+     *  - MAVEN_URL_SNAPSHOT: Containing the URL to use for the snapshot repository
+     *
+     * @param project The project
+     * @param defaultFolder The default folder if the required maven information is not currently set
+     * @return a closure
+     */
+    static getPublishingCloudMaven(String repositoryName, Project project, File defaultFolder = project.rootProject.file('repo')) {
+        return setupCloudSnapshotCompatiblePublishing(repositoryName, project, 'https://maven.pkg.github.com/CloudLoaderMC', defaultFolder)
     }
 
     /**
@@ -119,7 +136,7 @@ class GradleUtils {
      * @param defaultFolder The default folder if the required maven information is not currently set
      * @return a closure
      */
-    static setupSnapshotCompatiblePublishing(Project project, String fallbackPublishingEndpoint = 'https://maven.minecraftforge.net/', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
+    static setupForgeSnapshotCompatiblePublishing(Project project, String fallbackPublishingEndpoint = 'https://maven.minecraftforge.net/', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
         return { MavenArtifactRepository it ->
             name 'forge'
             if (System.env.MAVEN_USER && System.env.MAVEN_PASSWORD) {
@@ -151,6 +168,58 @@ class GradleUtils {
     }
 
     /**
+     * Get a closure to be passed into {@link org.gradle.api.artifacts.dsl.RepositoryHandler#maven(groovy.lang.Closure)}
+     * in a publishing block, this closure respects the current project's version, with regards to publishing to a release
+     * or snapshot repository.
+     *
+     * Important the following environment variables must be set for this to work:
+     *  - GITHUB_ACTOR: Containing the username to use for authentication
+     *  - GITHUB_TOKEN: Containing the password to use for authentication
+     *
+     * The following environment variables are optional:
+     *  - MAVEN_URL_RELEASE: Containing the URL to use for the release repository
+     *  - MAVEN_URL_SNAPSHOT: Containing the URL to use for the snapshot repository
+     *
+     * If the MAVEN_URL_RELEASE is not set the passed in fallback URL will be used for the release repository.
+     * By default this is: https://maven.pkg.github.com/CloudLoaderMC
+     * This is done to preserve backwards compatibility with the old {@link #getPublishingCloudMaven(String, Project, File)} method.
+     *
+     * @param project The project
+     * @param defaultFolder The default folder if the required maven information is not currently set
+     * @return a closure
+     */
+    static setupCloudSnapshotCompatiblePublishing(String repositoryName, Project project, String fallbackPublishingEndpoint = 'https://maven.pkg.github.com/CloudLoaderMC', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
+        return { MavenArtifactRepository it ->
+            name 'GitHubPackages'
+            if (System.env.GITHUB_ACTOR && System.env.GITHUB_TOKEN) {
+                def publishingEndpoint = fallbackPublishingEndpoint
+                if (System.env.MAVEN_URL_RELEASE) {
+                    publishingEndpoint = System.env.MAVEN_URL_RELEASE
+                }
+
+                if (project.version.toString().endsWith("-SNAPSHOT") && System.env.MAVEN_URL_SNAPSHOTS) {
+                    url System.env.MAVEN_URL_SNAPSHOTS + "/" + repositoryName
+                } else {
+                    url publishingEndpoint + "/" + repositoryName
+                }
+                authentication {
+                    basic(BasicAuthentication)
+                }
+                credentials {
+                    username = System.env.GITHUB_ACTOR
+                    password = System.env.GITHUB_TOKEN
+                }
+            } else {
+                if (project.version.toString().endsWith("-SNAPSHOT")) {
+                    url 'file://' + defaultSnapshotFolder.getAbsolutePath() + "/" + repositoryName
+                } else {
+                    url 'file://' + defaultFolder.getAbsolutePath() + "/" + repositoryName
+                }
+            }
+        }
+    }
+
+    /**
      * Get a closure for the Forge maven to be passed into {@link org.gradle.api.artifacts.dsl.RepositoryHandler#maven(groovy.lang.Closure)}
      * in a repositories block.
      *
@@ -160,6 +229,19 @@ class GradleUtils {
         return { MavenArtifactRepository it ->
             name 'forge'
             url 'https://maven.minecraftforge.net/'
+        }
+    }
+
+    /**
+     * Get a closure for the Cloud maven to be passed into {@link org.gradle.api.artifacts.dsl.RepositoryHandler#maven(groovy.lang.Closure)}
+     * in a repositories block.
+     *
+     * @return a closure
+     */
+    static getCloudMaven() {
+        return { MavenArtifactRepository it ->
+            name 'cloud'
+            url 'https://maven.pkg.github.com/CloudLoaderMC'
         }
     }
 
@@ -177,6 +259,19 @@ class GradleUtils {
     }
 
     /**
+     * Get a closure for the Cloud maven to be passed into {@link org.gradle.api.artifacts.dsl.RepositoryHandler#maven(groovy.lang.Closure)}
+     * in a repositories block.
+     *
+     * @return a closure
+     */
+    static getCloudReleaseMaven() {
+        return { MavenArtifactRepository it ->
+            name 'cloud-releases'
+            url 'https://maven.pkg.github.com/CloudLoaderMC'
+        }
+    }
+
+    /**
      * Get a closure for the Forge maven to be passed into {@link org.gradle.api.artifacts.dsl.RepositoryHandler#maven(groovy.lang.Closure)}
      * in a repositories block.
      *
@@ -186,6 +281,19 @@ class GradleUtils {
         return { MavenArtifactRepository it ->
             name 'forge-snapshots'
             url 'https://maven.minecraftforge.net/snapshots'
+        }
+    }
+
+    /**
+     * Get a closure for the Cloud maven to be passed into {@link org.gradle.api.artifacts.dsl.RepositoryHandler#maven(groovy.lang.Closure)}
+     * in a repositories block.
+     *
+     * @return a closure
+     */
+    static getCloudSnapshotMaven() {
+        return { MavenArtifactRepository it ->
+            name 'cloud-snapshots'
+            url 'https://maven.pkg.github.com/CloudLoaderMC'
         }
     }
 
@@ -287,13 +395,13 @@ class GradleUtils {
     }
 
     /**
-     * Builds a project url for a project under the minecraft forge organisation.
+     * Builds a project url for a project under the CloudLoaderMC organisation.
      *
      * @param project The name of the project. (As in the project slug on github).
      * @return The github url of the project.
      */
     static String buildProjectUrl(String project) {
-        return buildProjectUrl("MinecraftForge", project)
+        return buildProjectUrl("CloudLoaderMC", project)
     }
 
     /**

@@ -18,10 +18,10 @@
  * USA
  */
 
-package net.minecraftforge.gradleutils.tasks;
+package ml.darubyminer360.gradleutils.tasks;
 
-import net.minecraftforge.gradleutils.ChangelogUtils;
-import net.minecraftforge.gradleutils.GradleUtils;
+import ml.darubyminer360.gradleutils.ChangelogUtils;
+import ml.darubyminer360.gradleutils.GradleUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Transformer;
 import org.gradle.api.file.DirectoryProperty;

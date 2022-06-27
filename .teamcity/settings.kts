@@ -37,7 +37,7 @@ project {
         text("docker_jdk_version", "8", label = "Gradle version", description = "The version of the JDK to use during execution of tasks in a JDK.", display = ParameterDisplay.HIDDEN, allowEmpty = false)
         text("docker_gradle_version", "7.4.2", label = "Gradle version", description = "The version of Gradle to use during execution of Gradle tasks.", display = ParameterDisplay.HIDDEN, allowEmpty = false)
         text("env.PUBLISHED_JAVA_ARTIFACT_ID", "GradleUtils", label = "Published artifact id", description = "The maven coordinate artifact id that has been published by this build. Can not be empty.", allowEmpty = false)
-        text("env.PUBLISHED_JAVA_GROUP", "net.minecraftforge.gradleutils", label = "Published group", description = "The maven coordinate group that has been published by this build. Can not be empty.", allowEmpty = false)
+        text("env.PUBLISHED_JAVA_GROUP", "ml.darubyminer360.gradleutils", label = "Published group", description = "The maven coordinate group that has been published by this build. Can not be empty.", allowEmpty = false)
     }
 
     features {

@@ -18,9 +18,9 @@
  * USA
  */
 
-package net.minecraftforge.gradleutils
+package ml.darubyminer360.gradleutils
 
-import net.minecraftforge.gradleutils.tasks.GenerateChangelogTask
+import ml.darubyminer360.gradleutils.tasks.GenerateChangelogTask
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.errors.MissingObjectException

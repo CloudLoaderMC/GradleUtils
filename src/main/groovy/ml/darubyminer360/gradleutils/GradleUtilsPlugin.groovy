@@ -18,9 +18,9 @@
  * USA
  */
 
-package net.minecraftforge.gradleutils
+package ml.darubyminer360.gradleutils
 
-import net.minecraftforge.gradleutils.tasks.ExtractTeamCityProjectConfigurationTask
+import ml.darubyminer360.gradleutils.tasks.ExtractTeamCityProjectConfigurationTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

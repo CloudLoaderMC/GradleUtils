@@ -191,7 +191,7 @@ class GradleUtils {
     static setupCloudSnapshotCompatiblePublishing(String repositoryName, Project project, String fallbackPublishingEndpoint = 'https://maven.pkg.github.com/CloudLoaderMC', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
         return { MavenArtifactRepository it ->
             name 'GitHubPackages'
-            if (System.env.GITHUB_ACTOR && System.env.GITHUB_TOKEN) {
+            if (System.getenv("GITHUB_ACTOR") && System.getenv("GITHUB_TOKEN")) {
                 def publishingEndpoint = fallbackPublishingEndpoint
                 if (System.env.MAVEN_URL_RELEASE) {
                     publishingEndpoint = System.env.MAVEN_URL_RELEASE
@@ -206,8 +206,8 @@ class GradleUtils {
                     basic(BasicAuthentication)
                 }
                 credentials {
-                    username = System.env.GITHUB_ACTOR
-                    password = System.env.GITHUB_TOKEN
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
                 }
             } else {
                 if (project.version.toString().endsWith("-SNAPSHOT")) {

@@ -8,8 +8,7 @@
 name: Publish package to GitHub Packages
 
 on:
-  release:
-    types: [created]
+  [create, workflow_dispatch]
 
 jobs:
   publish:

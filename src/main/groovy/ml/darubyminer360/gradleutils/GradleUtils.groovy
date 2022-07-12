@@ -102,8 +102,8 @@ class GradleUtils {
      * in a publishing block.
      *
      * Important the following environment variables must be set for this to work:
-     *  - GITHUB_ACTOR: Containing the username to use for authentication
-     *  - GITHUB_TOKEN: Containing the password to use for authentication
+     *  - MAVEN_USER: Containing the username to use for authentication
+     *  - MAVEN_PASSWORD: Containing the password to use for authentication
      *  - MAVEN_URL_RELEASE: Containing the URL to use for the release repository
      *  - MAVEN_URL_SNAPSHOT: Containing the URL to use for the snapshot repository
      *
@@ -111,8 +111,8 @@ class GradleUtils {
      * @param defaultFolder The default folder if the required maven information is not currently set
      * @return a closure
      */
-    static getPublishingCloudMaven(String repositoryName, Project project, File defaultFolder = project.rootProject.file('repo')) {
-        return setupCloudSnapshotCompatiblePublishing(repositoryName, project, 'https://maven.pkg.github.com/CloudLoaderMC', defaultFolder)
+    static getPublishingCloudMaven(Project project, File defaultFolder = project.rootProject.file('repo')) {
+        return setupCloudSnapshotCompatiblePublishing(project, 'https://maven.cloudmc.ml/', defaultFolder)
     }
 
     /**
@@ -173,47 +173,47 @@ class GradleUtils {
      * or snapshot repository.
      *
      * Important the following environment variables must be set for this to work:
-     *  - GITHUB_ACTOR: Containing the username to use for authentication
-     *  - GITHUB_TOKEN: Containing the password to use for authentication
+     *  - MAVEN_USER: Containing the username to use for authentication
+     *  - MAVEN_PASSWORD: Containing the password to use for authentication
      *
      * The following environment variables are optional:
      *  - MAVEN_URL_RELEASE: Containing the URL to use for the release repository
      *  - MAVEN_URL_SNAPSHOT: Containing the URL to use for the snapshot repository
      *
      * If the MAVEN_URL_RELEASE is not set the passed in fallback URL will be used for the release repository.
-     * By default this is: https://maven.pkg.github.com/CloudLoaderMC
-     * This is done to preserve backwards compatibility with the old {@link #getPublishingCloudMaven(String, Project, File)} method.
+     * By default this is: https://maven.cloudmc.ml/
+     * This is done to preserve backwards compatibility with the old {@link #getPublishingCloudMaven(Project, File)} method.
      *
      * @param project The project
      * @param defaultFolder The default folder if the required maven information is not currently set
      * @return a closure
      */
-    static setupCloudSnapshotCompatiblePublishing(String repositoryName, Project project, String fallbackPublishingEndpoint = 'https://maven.pkg.github.com/CloudLoaderMC', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
+    static setupCloudSnapshotCompatiblePublishing(Project project, String fallbackPublishingEndpoint = 'https://maven.cloudmc.ml/', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
         return { MavenArtifactRepository it ->
-            name 'GitHubPackages'
-            if (System.getenv("GITHUB_ACTOR") && System.getenv("GITHUB_TOKEN")) {
+            name 'Cloud'
+            if (System.env.MAVEN_USER && System.env.MAVEN_PASSWORD) {
                 def publishingEndpoint = fallbackPublishingEndpoint
                 if (System.env.MAVEN_URL_RELEASE) {
                     publishingEndpoint = System.env.MAVEN_URL_RELEASE
                 }
 
                 if (project.version.toString().endsWith("-SNAPSHOT") && System.env.MAVEN_URL_SNAPSHOTS) {
-                    url System.env.MAVEN_URL_SNAPSHOTS + "/" + repositoryName
+                    url System.env.MAVEN_URL_SNAPSHOTS
                 } else {
-                    url publishingEndpoint + "/" + repositoryName
+                    url publishingEndpoint
                 }
                 authentication {
                     basic(BasicAuthentication)
                 }
                 credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
+                    username = System.env.MAVEN_USER
+                    password = System.env.MAVEN_PASSWORD
                 }
             } else {
                 if (project.version.toString().endsWith("-SNAPSHOT")) {
-                    url 'file://' + defaultSnapshotFolder.getAbsolutePath() + "/" + repositoryName
+                    url 'file://' + defaultSnapshotFolder.getAbsolutePath()
                 } else {
-                    url 'file://' + defaultFolder.getAbsolutePath() + "/" + repositoryName
+                    url 'file://' + defaultFolder.getAbsolutePath()
                 }
             }
         }
@@ -240,8 +240,8 @@ class GradleUtils {
      */
     static getCloudMaven() {
         return { MavenArtifactRepository it ->
-            name 'cloud'
-            url 'https://maven.pkg.github.com/CloudLoaderMC'
+            name = 'Cloud'
+            url = 'https://maven.cloudmc.ml/'
         }
     }
 
@@ -266,8 +266,8 @@ class GradleUtils {
      */
     static getCloudReleaseMaven() {
         return { MavenArtifactRepository it ->
-            name 'cloud-releases'
-            url 'https://maven.pkg.github.com/CloudLoaderMC'
+            name = 'Cloud-releases'
+            url = 'https://maven.cloudmc.ml/releases'
         }
     }
 
@@ -292,8 +292,8 @@ class GradleUtils {
      */
     static getCloudSnapshotMaven() {
         return { MavenArtifactRepository it ->
-            name 'cloud-snapshots'
-            url 'https://maven.pkg.github.com/CloudLoaderMC'
+            name = 'Cloud-snapshots'
+            url = 'https://maven.cloudmc.ml/snapshots'
         }
     }
 
@@ -437,9 +437,9 @@ class GradleUtils {
 
         //Get the origin remote.
         def originRemote = remotes.toList().stream()
-            .filter(r -> r.getName().equals("origin"))
-            .findFirst()
-            .orElse(null)
+                .filter(r -> r.getName().equals("origin"))
+                .findFirst()
+                .orElse(null)
 
         //We do not have an origin named remote
         if (originRemote == null)
@@ -449,8 +449,8 @@ class GradleUtils {
 
         //Get the origin push url.
         def originUrl = originRemote.getURIs().toList().stream()
-            .findFirst()
-            .orElse(null)
+                .findFirst()
+                .orElse(null)
 
         //We do not have a origin url
         if (originUrl == null)

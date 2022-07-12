@@ -112,7 +112,7 @@ class GradleUtils {
      * @return a closure
      */
     static getPublishingCloudMaven(Project project, File defaultFolder = project.rootProject.file('repo')) {
-        return setupCloudSnapshotCompatiblePublishing(project, 'https://maven.cloudmc.ml/', defaultFolder)
+        return setupCloudSnapshotCompatiblePublishing(project, 'https://maven.cloudmc.ml/releases/', defaultFolder)
     }
 
     /**
@@ -181,14 +181,14 @@ class GradleUtils {
      *  - MAVEN_URL_SNAPSHOT: Containing the URL to use for the snapshot repository
      *
      * If the MAVEN_URL_RELEASE is not set the passed in fallback URL will be used for the release repository.
-     * By default this is: https://maven.cloudmc.ml/
+     * By default this is: https://maven.cloudmc.ml/releases/
      * This is done to preserve backwards compatibility with the old {@link #getPublishingCloudMaven(Project, File)} method.
      *
      * @param project The project
      * @param defaultFolder The default folder if the required maven information is not currently set
      * @return a closure
      */
-    static setupCloudSnapshotCompatiblePublishing(Project project, String fallbackPublishingEndpoint = 'https://maven.cloudmc.ml/', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
+    static setupCloudSnapshotCompatiblePublishing(Project project, String fallbackPublishingEndpoint = 'https://maven.cloudmc.ml/releases/', File defaultFolder = project.rootProject.file('repo'), File defaultSnapshotFolder = project.rootProject.file('snapshots')) {
         return { MavenArtifactRepository it ->
             name 'Cloud'
             if (System.env.MAVEN_USER && System.env.MAVEN_PASSWORD) {
@@ -241,7 +241,7 @@ class GradleUtils {
     static getCloudMaven() {
         return { MavenArtifactRepository it ->
             name = 'Cloud'
-            url = 'https://maven.cloudmc.ml/'
+            url = 'https://maven.cloudmc.ml/releases/'
         }
     }
 
@@ -437,9 +437,9 @@ class GradleUtils {
 
         //Get the origin remote.
         def originRemote = remotes.toList().stream()
-            .filter(r -> r.getName().equals("origin"))
-            .findFirst()
-            .orElse(null)
+                .filter(r -> r.getName().equals("origin"))
+                .findFirst()
+                .orElse(null)
 
         //We do not have an origin named remote
         if (originRemote == null)
@@ -449,8 +449,8 @@ class GradleUtils {
 
         //Get the origin push url.
         def originUrl = originRemote.getURIs().toList().stream()
-            .findFirst()
-            .orElse(null)
+                .findFirst()
+                .orElse(null)
 
         //We do not have a origin url
         if (originUrl == null)

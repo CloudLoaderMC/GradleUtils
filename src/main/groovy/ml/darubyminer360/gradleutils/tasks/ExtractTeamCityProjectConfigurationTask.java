@@ -31,6 +31,7 @@ import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.tasks.*;
 import org.gradle.jvm.toolchain.JavaLanguageVersion;
+import org.gradle.util.GradleVersion;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -306,12 +307,11 @@ public abstract class ExtractTeamCityProjectConfigurationTask extends DefaultTas
      * Determines the project name of the organisation of github.
      * Querries the first remote of the current git project and pulls its fetch URL information to extract the name.
      *
-     * @param projectDir The project directory.
+     * @param git the project git
      * @return The organisation name of the project on github.
      */
-    private static String determineGitHubProjectOrganisation(final File projectDir) throws Exception
+    private static String determineGitHubProjectOrganisation(final Git git) throws Exception
     {
-        final Git git = Git.open(projectDir);
         final String repositoryPath = git.remoteList().call().get(0).getURIs().get(0).getPath();
 
         final String[] pathMembers = repositoryPath.split("/");
